@@ -1,0 +1,12 @@
+(C) 2018 HeartWare
+
+Distributed under Creative Commons License CC-BY-SA.
+
+Generally speaking this grants you a limited right to use this software - also commercial use - as long as you attribute
+the author in your documentation. Also, if you change the software (f.ex. to suit your specific needs) you must make
+available your modifications under a license not stricter than the original license the work was distributed under.
+
+Read more here:
+
+https://en.wikipedia.org/wiki/Attribution_(copyright) - BY (Attribution)
+https://en.wikipedia.org/wiki/Share-alike - SA (Share-Alike)
