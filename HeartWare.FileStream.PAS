@@ -101,7 +101,7 @@ PROCEDURE TFileStream.AppendFile(CONST FileName : TFileName ; Mode : Cardinal ; 
       ExclIdx   : Cardinal;
 
     BEGIN
-      ShareIdx:=(Mode AND ShareBits) SHR 4; AccessIdx:=Mode AND AccessBits; ExclIdx:=(Mode AND ExclusiveBits) SHR 2;
+      ShareIdx:=(Mode AND ShareBits) SHR 4; ExclIdx:=(Mode AND ExclusiveBits) SHR 2; AccessIdx:=Mode AND AccessBits;
       IF (ShareIdx IN [LOW(ShareMode)..HIGH(ShareMode)]) AND (AccessIdx IN [LOW(Access)..HIGH(Access)]) AND (ExclIdx IN [LOW(Exclusive)..HIGH(Exclusive)]) THEN
         Result:=CreateFile(PChar(FileName),Access[AccessIdx],ShareMode[ShareIdx],NIL,Exclusive[ExclIdx],FILE_ATTRIBUTE_NORMAL,0)
       ELSE
@@ -111,8 +111,9 @@ PROCEDURE TFileStream.AppendFile(CONST FileName : TFileName ; Mode : Cardinal ; 
   BEGIN
     Exists:=FileExists(FileName); Append:=Mode AND AppendBits; Access:=Mode AND AccessBits; Sharing:=Mode AND ShareBits;
     IF Sharing=0 THEN Sharing:=Share;
-    IF (Append=fmAppendExisting) AND NOT Exists THEN
-      FHandle:=INVALID_HANDLE_VALUE
+    IF (Append=fmAppendExisting) AND NOT Exists THEN BEGIN
+      FHandle:=INVALID_HANDLE_VALUE;
+      SetLastError(ERROR_FILE_EXISTS) END
     ELSE BEGIN
       IF Access=fmOpenRead THEN BEGIN
         Access:=fmOpenWrite;
