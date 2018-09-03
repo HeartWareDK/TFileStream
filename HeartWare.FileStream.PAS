@@ -5,15 +5,15 @@ INTERFACE
 USES Classes,SysUtils;
 
 CONST
-  fmAppend              = $80000000;
-  fmAppendExisting      = $40000000;
+  fmAppend              = Cardinal($80000000);
+  fmAppendExisting      = Cardinal($40000000);
 
 TYPE
   TFileStream   = CLASS(Classes.TFileStream)
-                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Share : Cardinal); OVERLOAD;
-                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Encoding : TEncoding ; Share : Cardinal); OVERLOAD;
-                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal); OVERLOAD;
-                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Encoding : TEncoding); OVERLOAD;
+                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Share : Cardinal); REINTRODUCE; OVERLOAD;
+                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Encoding : TEncoding ; Share : Cardinal); REINTRODUCE; OVERLOAD;
+                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal); REINTRODUCE; OVERLOAD;
+                    CONSTRUCTOR         Create(CONST FileName : TFileName ; Mode : Cardinal ; Encoding : TEncoding); REINTRODUCE; OVERLOAD;
                     DESTRUCTOR          Destroy; OVERRIDE;
                   STRICT PRIVATE
                     FName               : TFileName;
@@ -29,6 +29,7 @@ TYPE
                     FUNCTION            CreateTextWriter(Encoding : TEncoding) : TTextWriter;   VIRTUAL;
                     FUNCTION            DefEncoding : TEncoding;                                VIRTUAL;
                     FUNCTION            DefaultShare(Mode : Cardinal) : Cardinal;               VIRTUAL;
+                    PROCEDURE           AfterConstruction;                                      OVERRIDE;
                   PUBLIC
                     CLASS VAR           DefaultEncoding : TEncoding;
                     FUNCTION            TW : TTextWriter;
@@ -55,7 +56,7 @@ CONSTRUCTOR TFileStream.Create(CONST FileName : TFileName ; Mode : Cardinal ; En
 
 FUNCTION TFileStream.DefaultShare(Mode : Cardinal) : Cardinal;
   BEGIN
-    IF Mode AND AppendBits=0 THEN Result:=0 ELSE Result:=fmShareAuto
+    IF Mode AND AppendBits=0 THEN Result:=fmShareCompat ELSE Result:=fmShareAuto
   END;
 
 FUNCTION TFileStream.DefEncoding : TEncoding;
@@ -160,6 +161,12 @@ PROCEDURE TFileStream.WriteLine(CONST Format : STRING ; CONST Args : ARRAY OF CO
 PROCEDURE TFileStream.WriteLine(CONST S : STRING);
   BEGIN
     TW.WriteLine(S)
+  END;
+
+PROCEDURE TFileStream.AfterConstruction;
+  BEGIN
+    IF NOT Assigned(Encoding) THEN Encoding:=DefEncoding;
+    INHERITED
   END;
 
 END.
